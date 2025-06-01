@@ -1,0 +1,57 @@
+{% extends "admin/admin_base_layout.html" %}
+
+{% block title %}{{ title }} - Admin Paneli{% endblock %}
+
+{% block content %}
+<div class="container mt-lg-5 mt-4"> {# Üstten biraz daha fazla boşluk için mt-lg-5 eklendi #}
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 col-xl-5">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white"> {# admin_base_layout.html ile uyumlu renkler #}
+                    <h4 class="mb-0 text-center">{{ title }}</h4>
+                </div>
+                <div class="card-body p-4">
+                    {# Flash mesajlar admin_base_layout.html tarafından zaten gösteriliyor #}
+                    
+                    <p class="mb-3 text-center">
+                        Lütfen <strong>{{ email | safe }}</strong> e-posta adresinize gönderilen 6 haneli doğrulama kodunu giriniz.
+                    </p>
+                    <form method="POST" action="{{ url_for('admin_verify_code') }}">
+                        <div class="mb-3"> {# Bootstrap 5 için form-group yerine mb-3 #}
+                            <label for="verification_code" class="form-label visually-hidden">Doğrulama Kodu</label> {# Label gizlendi, placeholder yeterli #}
+                            <input type="text" name="verification_code" id="verification_code" 
+                                   class="form-control form-control-lg text-center" 
+                                   placeholder="Doğrulama Kodu"
+                                   required maxlength="6" pattern="\d{6}" 
+                                   title="6 haneli sayısal kod giriniz"
+                                   autocomplete="one-time-code" inputmode="numeric" autofocus>
+                        </div>
+                        <div class="d-grid gap-2"> {# Butonlar için d-grid #}
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-check-circle me-2"></i>Doğrula ve Giriş Yap
+                            </button>
+                            <a href="{{ url_for('admin_login') }}" class="btn btn-outline-secondary btn-sm mt-2">
+                                <i class="fas fa-arrow-left me-2"></i>Giriş Ekranına Dön
+                            </a>
+                        </div>
+                    </form>
+                    {# Opsiyonel: Kodu tekrar gönderme bağlantısı eklenebilir
+                       Eğer eklerseniz, app.py'de bunun için bir rota ve fonksiyon oluşturmanız gerekir.
+                    <div class="text-center mt-3">
+                        <a href="#" id="resendAdmin2FACodeLink">Kodu Tekrar Gönder</a>
+                    </div>
+                    #}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{# Bu sayfaya özel JavaScript kodlarınız varsa buraya ekleyebilirsiniz.
+<script>
+    // Örnek: document.getElementById('resendAdmin2FACodeLink').addEventListener(...)
+</script>
+#}
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends "admin/admin_base_layout.html" %}
+
+{% block title %}{{ title }} - Admin Paneli{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+        <h1 class="h3 mb-0 text-gray-800">{{ title }}</h1>
+        {# Sadece ana admin yeni admin ekleyebilir #}
+        {% if admin_user and admin_user.username == 'mehmetalper04' %}
+        <a href="{{ url_for('admin_add_new_admin_user') }}" class="btn btn-success btn-icon-split">
+            <span class="icon text-white-50">
+                <i class="fas fa-user-plus"></i>
+            </span>
+            <span class="text">Yeni Admin Ekle</span>
+        </a>
+        {% endif %}
+    </div>
+
+    {# Flash mesajlar admin_base_layout.html tarafından zaten gösteriliyor #}
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Tüm Kullanıcılar</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="usersTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Kullanıcı Adı</th>
+                            <th>E-posta</th>
+                            <th>Admin mi?</th>
+                            <th>E-posta Doğrulanmış mı?</th>
+                            <th>Aktif mi?</th>
+                            <th>Kayıt Tarihi</th>
+                            <th style="width: 150px;">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user_item in users_list %}
+                        <tr class="{% if not user_item.is_active %}table-secondary text-muted{% elif user_item.id == admin_user.id %}table-info{% endif %}">
+                            <td>{{ user_item.id }}</td>
+                            <td>{{ user_item.username | escape }}</td>
+                            <td>{{ user_item.email | escape }}</td>
+                            <td>
+                                {% if user_item.is_admin %}<span class="badge bg-primary">Evet</span>{% else %}<span class="badge bg-secondary">Hayır</span>{% endif %}
+                            </td>
+                            <td>
+                                {% if user_item.email_verified %}<span class="badge bg-info text-dark">Evet</span>{% else %}<span class="badge bg-warning text-dark">Hayır</span>{% endif %}
+                            </td>
+                            <td>
+                                {% if user_item.is_active %}
+                                    <span class="badge bg-success">Evet</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Hayır (Devre Dışı)</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ user_item.created_at.strftime('%Y-%m-%d %H:%M') if user_item.created_at else '-' }}</td>
+                            <td>
+                                {% if admin_user and admin_user.username == 'mehmetalper04' %} {# Sadece ana admin işlem yapabilir #}
+                                    {% if user_item.username == 'mehmetalper04' %}
+                                        <span class="text-muted fst-italic">(Ana Admin)</span>
+                                    {% elif user_item.id == admin_user.id %}
+                                        <span class="text-muted fst-italic">(Kendiniz)</span>
+                                    {% else %} {# Diğer kullanıcılar (diğer adminler dahil) #}
+                                        <form method="POST" action="{{ url_for('admin_toggle_user_status', user_to_toggle_id=user_item.id) }}" style="display:inline;"
+                                              onsubmit="return confirm('Kullanıcı: ' + {{ user_item.username | tojson | safe }} + '\nBu kullanıcının aktiflik durumunu değiştirmek istediğinizden emin misiniz?');">
+                                            {% if user_item.is_active %}
+                                                <button type="submit" class="btn btn-warning btn-sm" title="Kullanıcıyı Devre Dışı Bırak">
+                                                    <i class="fas fa-user-slash"></i> Devre Dışı
+                                                </button>
+                                            {% else %}
+                                                <button type="submit" class="btn btn-info btn-sm" title="Kullanıcıyı Aktifleştir">
+                                                    <i class="fas fa-user-check"></i> Aktifleştir
+                                                </button>
+                                            {% endif %}
+                                        </form>
+                                    {% endif %}
+                                {% elif user_item.id == admin_user.id %} {# Ana admin olmayan, kendine bakıyor #}
+                                     <span class="text-muted fst-italic">(Kendiniz)</span>
+                                {% elif user_item.username == 'mehmetalper04' %} {# Ana admin olmayan, ana admine bakıyor #}
+                                     <span class="text-muted fst-italic">(Ana Admin)</span>
+                                {% else %}
+                                    <span class="text-muted">-</span> {# Ana admin olmayan, diğer kullanıcılara bakıyor #}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center">Kayıtlı kullanıcı bulunamadı.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+{# İsteğe bağlı: DataTables gibi bir kütüphane ile tabloya arama, sıralama, sayfalama eklenebilir #}
+{#
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css"/>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#usersTable').DataTable({
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/tr.json" // Türkçe dil dosyası
+            },
+            "order": [[ 3, "desc" ], [ 5, "desc" ], [ 1, "asc" ]] // Önce admin, sonra aktiflik, sonra kullanıcı adına göre sırala
+        });
+    });
+</script>
+#}
+{% endblock %}

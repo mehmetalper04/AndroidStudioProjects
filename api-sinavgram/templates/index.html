@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Hoş Geldiniz - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1 class="display-4"><strong>{{ app_name }}</strong>'e Hoş Geldiniz!</h1>
+    <p class="lead">Binlerce soru ile bilginizi sınayın, öğrenin ve puan kazanın.</p>
+    <hr class="my-4">
+    <p>Hemen başlayın, derslerdeki başarınızı artırın ve liderlik tablosunda yerinizi alın.</p>
+    <a class="btn btn-primary btn-lg mr-2" href="{{ url_for('register_page') }}" role="button">Hemen Kayıt Ol</a>
+    <a class="btn btn-secondary btn-lg" href="{{ url_for('login_page') }}" role="button">Giriş Yap</a>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <h2>Çeşitli Dersler</h2>
+        <p>Matematik, Türkçe, Fen Bilimleri ve daha birçok dersten binlerce soru.</p>
+    </div>
+    <div class="col-md-4">
+        <h2>Puan Sistemi</h2>
+        <p>Doğru cevaplarla puan kazanın, yanlış cevaplarla tecrübe edinin.</p>
+    </div>
+    <div class="col-md-4">
+        <h2>Premium Üyelik</h2>
+        <p>Reklamsız deneyim ve özel avantajlar için <a href="{{ url_for('premium_info_page') }}">premium</a> üyeliğe geçin.</p>
+    </div>
+</div>
+{% endblock %}

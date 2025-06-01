@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ app_name }}{% endblock %}</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head_extra %}{% endblock %}
+    <style>
+        /* base.html'e özel inline stiller (style.css'e de taşınabilir) */
+        body {
+            padding-top: 70px; /* Navbar yüksekliğine göre ayarlandı (fixed-top için) */
+            display: flex; /* Sticky footer için */
+            flex-direction: column; /* Sticky footer için */
+            min-height: 100vh; /* Sticky footer için */
+        }
+        .content-wrapper {
+            flex: 1 0 auto; /* Sticky footer için: içeriğin büyümesini ve küçülmemesini sağlar */
+        }
+        .footer {
+            flex-shrink: 0; /* Sticky footer için: footer'ın küçülmemesini sağlar */
+            background-color: rgba(248, 249, 250, 0.9); /* Hafif yarı saydam */
+            padding: 20px 0;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+            /* margin-top kaldırıldı, flexbox ile yönetilecek */
+        }
+        .navbar-brand strong { color: #007bff; }
+        .alert-container { position: fixed; top: 70px; right: 20px; z-index: 1050; width: auto; min-width: 300px; max-width: 90%;}
+        .navbar.bg-light {
+            background-color: rgba(255, 255, 255, 0.95) !important; /* Daha opak beyaz */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{{ url_for('index_page') }}"><strong>{{ app_name }}</strong></a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index_page') }}">Ana Sayfa</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('premium_info_page') }}">Premium</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('live_stats_page') }}">Canlı İstatistikler</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto" id="auth-links">
+                    </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="content-wrapper"> {# YENİ: Ana içerik sarmalayıcısı #}
+        <div class="alert-container" id="alert-placeholder"></div>
+        <div class="container mt-4">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; {{ now_utc.year }} {{ app_name }}. Tüm hakları saklıdır.</p>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        const APP_NAME = "{{ app_name }}"; 
+        const API_BASE_URL = "{{ config.API_BASE_URL }}";
+
+        function showAlert(message, type = 'info') {
+            const alertPlaceholder = document.getElementById('alert-placeholder');
+            if (!alertPlaceholder) return;
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = [
+                `<div class="alert alert-${type} alert-dismissible fade show" role="alert">`,
+                `   <div>${message}</div>`,
+                '   <button type="button" class="close" data-dismiss="alert" aria-label="Close">',
+                '       <span aria-hidden="true">&times;</span>',
+                '   </button>',
+                '</div>'
+            ].join('');
+            alertPlaceholder.append(wrapper);
+            
+            setTimeout(() => {
+                if (wrapper.firstChild && wrapper.firstChild.parentNode === wrapper) {
+                     wrapper.firstChild.classList.remove('show');
+                     setTimeout(() => {
+                        if (wrapper.firstChild && wrapper.firstChild.parentNode === wrapper) {
+                            wrapper.removeChild(wrapper.firstChild);
+                        }
+                     }, 150);
+                }
+            }, 5000);
+        }
+
+        function updateNav() {
+            const authLinks = document.getElementById('auth-links');
+            if (!authLinks) return;
+            const token = localStorage.getItem('sorugram_token');
+            let user = null;
+            const userDataString = localStorage.getItem('sorugram_user');
+            if (userDataString) {
+                try { user = JSON.parse(userDataString); } 
+                catch (e) { console.error("Kullanıcı verisi parse edilemedi:", e); localStorage.removeItem('sorugram_user');}
+            }
+
+            if (token && user && user.username) {
+                authLinks.innerHTML = `
+                    <li class="nav-item">
+                        <span class="navbar-text mr-3">Merhaba, ${user.username} (${user.score !== undefined ? user.score : 'N/A'} Puan)</span>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="logout-link">Çıkış Yap</a>
+                    </li>
+                `;
+                const logoutLink = document.getElementById('logout-link');
+                if (logoutLink) {
+                    logoutLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        localStorage.removeItem('sorugram_token'); localStorage.removeItem('sorugram_user');
+                        showAlert('Başarıyla çıkış yaptınız.', 'success'); updateNav();
+                        if (!['/login', '/register'].includes(window.location.pathname)) {
+                             window.location.href = "{{ url_for('login_page') }}";
+                        }
+                    });
+                }
+            } else {
+                authLinks.innerHTML = `
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login_page') }}">Giriş Yap</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-primary btn-sm text-white" href="{{ url_for('register_page') }}">Kayıt Ol</a>
+                    </li>
+                `;
+            }
+        }
+        document.addEventListener('DOMContentLoaded', updateNav);
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block title %}Premium Üyelik - {{ super() }}{% endblock %}
+
+{% block head_extra %}
+<style>
+    .plans { display: flex; justify-content: space-around; margin-top: 30px; flex-wrap: wrap; }
+    .plan { border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin: 10px; width: 300px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .plan h3 { color: #007bff; }
+    .plan .price { font-size: 1.8em; font-weight: bold; margin: 10px 0; }
+    .plan .btn-premium { margin-top: 15px; }
+    .loading { display: none; text-align: center; margin-top: 15px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="text-center">
+        <h1>{{ app_name }} Premium Üyelik</h1>
+        <p class="lead">Reklamsız bir deneyim ve özel avantajlar için premium üyeliğe geçin!</p>
+    </div>
+
+    <h2 class="text-center mt-5">Premium Avantajları:</h2>
+    <ul class="features list-group list-group-flush w-50 mx-auto mt-3 mb-5">
+        <li class="list-group-item">✓ Tamamen reklamsız kullanım.</li>
+        <li class="list-group-item">✓ Gelecekte eklenecek özel içeriklere erken erişim.</li>
+        <li class="list-group-item">✓ Platform gelişimine destek olma.</li>
+        </ul>
+
+    <div class="plans">
+        <div class="plan">
+            <h3>Aylık Premium</h3>
+            <p class="price">{{ config.PREMIUM_PRICE_MONTHLY_TRY }} TL</p>
+            <p>/ Ay ({{ config.PREMIUM_DURATION_MONTHLY_DAYS }} gün)</p>
+            <button class="btn btn-primary btn-lg btn-premium" data-plan="monthly">Aylık Satın Al</button>
+        </div>
+        <div class="plan">
+            <h3>Yıllık Premium</h3>
+            <p class="price">{{ config.PREMIUM_PRICE_YEARLY_TRY }} TL</p>
+            <p>/ Yıl ({{ config.PREMIUM_DURATION_YEARLY_DAYS }} gün)</p>
+            <button class="btn btn-success btn-lg btn-premium" data-plan="yearly">Yıllık Satın Al</button>
+        </div>
+    </div>
+
+    <div id="loadingIndicator" class="loading mt-4">İşleniyor...</div>
+    <div id="messageArea" class="mt-4" style="text-align:center;"></div>
+
+    <p class="text-center mt-5" style="font-size: 0.9em; color: #666;">
+        Sorularınız için <a href="mailto:{{ config.MAIL_USERNAME }}">destek</a> ile iletişime geçebilirsiniz.
+    </p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('sorugram_token');
+    const user = JSON.parse(localStorage.getItem('sorugram_user'));
+    const purchaseButtons = document.querySelectorAll('.btn-premium');
+    const messageArea = document.getElementById('messageArea');
+
+    if (!token || !user) {
+        purchaseButtons.forEach(button => {
+            button.disabled = true;
+            button.title = "Satın almak için giriş yapmalısınız.";
+        });
+        messageArea.innerHTML = '<div class="alert alert-warning">Premium üyelik alabilmek için lütfen <a href="{{ url_for("login_page") }}">giriş yapın</a> veya <a href="{{ url_for("register_page") }}">kayıt olun</a>.</div>';
+        return; // Stop further processing if not logged in
+    }
+    // If user is already premium, you might want to show a different message or hide buttons
+    if (user && user.has_active_premium) {
+         messageArea.innerHTML = `<div class="alert alert-info">Zaten aktif bir premium üyeliğiniz var. Bitiş tarihi: ${new Date(user.premium_expiration_date).toLocaleDateString()}.</div>`;
+         purchaseButtons.forEach(button => button.style.display = 'none');
+    }
+
+
+    purchaseButtons.forEach(button => {
+        button.addEventListener('click', async function() {
+            const planType = this.dataset.plan;
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            
+            messageArea.innerHTML = ''; // Clear previous messages
+            loadingIndicator.style.display = 'block';
+            purchaseButtons.forEach(btn => btn.disabled = true);
+
+            try {
+                const response = await fetch("{{ url_for('subscribe_premium_api', _external=True) }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ plan_type: planType })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    messageArea.innerHTML = `<div class="alert alert-success">${data.message || 'Premium üyeliğiniz başarıyla aktifleştirildi!'}</div>`;
+                    // Update user info in localStorage
+                    const updatedUser = { ...user, ...data }; // Assuming API returns updated user fields
+                    localStorage.setItem('sorugram_user', JSON.stringify(updatedUser));
+                    updateNav(); // Refresh navbar if it shows premium status
+                    showAlert(data.message || 'Premium üyelik aktifleştirildi!', 'success');
+                     purchaseButtons.forEach(button => button.style.display = 'none'); // Hide buttons after successful purchase
+                } else {
+                    messageArea.innerHTML = `<div class="alert alert-danger">${data.message || 'Bir hata oluştu. Lütfen tekrar deneyin.'}</div>`;
+                    purchaseButtons.forEach(btn => btn.disabled = false); // Re-enable on error
+                }
+            } catch (error) {
+                console.error('Premium subscribe error:', error);
+                messageArea.innerHTML = '<div class="alert alert-danger">Ağ hatası veya sunucuya ulaşılamıyor. Lütfen internet bağlantınızı kontrol edin.</div>';
+                purchaseButtons.forEach(btn => btn.disabled = false); // Re-enable on error
+            } finally {
+                loadingIndicator.style.display = 'none';
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

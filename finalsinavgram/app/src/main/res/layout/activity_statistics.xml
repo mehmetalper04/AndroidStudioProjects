@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.StatisticsActivity">
+
+    <ProgressBar
+        android:id="@+id/progressBarStats"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/statsContentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                <TextView style="@style/StatisticLabel" android:text="Kullanıcı Adı:"/>
+                <TextView android:id="@+id/textViewStatsUsername" style="@style/StatisticValue" tools:text="test_kullanici"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                <TextView style="@style/StatisticLabel" android:text="Puan:"/>
+                <TextView android:id="@+id/textViewStatsScore" style="@style/StatisticValue" tools:text="12500"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                <TextView style="@style/StatisticLabel" android:text="@string/stats_total_answered"/>
+                <TextView android:id="@+id/textViewStatsTotalAnswered" style="@style/StatisticValue" tools:text="150"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                <TextView style="@style/StatisticLabel" android:text="@string/stats_true_answers"/>
+                <TextView android:id="@+id/textViewStatsCorrect" style="@style/StatisticValue" tools:text="100"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                <TextView style="@style/StatisticLabel" android:text="@string/stats_false_answers"/>
+                <TextView android:id="@+id/textViewStatsIncorrect" style="@style/StatisticValue" tools:text="30"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="16dp">
+                <TextView style="@style/StatisticLabel" android:text="@string/stats_blank_answers"/>
+                <TextView android:id="@+id/textViewStatsBlank" style="@style/StatisticValue" tools:text="20"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                <TextView style="@style/StatisticLabel" android:text="Doğruluk (Boşlar Hariç):"/>
+                <TextView android:id="@+id/textViewStatsAccuracy" style="@style/StatisticValue" tools:text="76.92%"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                <TextView style="@style/StatisticLabel" android:text="@string/stats_true_rate"/>
+                <TextView android:id="@+id/textViewStatsTrueRate" style="@style/StatisticValue" tools:text="66.67%"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                <TextView style="@style/StatisticLabel" android:text="@string/stats_false_rate"/>
+                <TextView android:id="@+id/textViewStatsFalseRate" style="@style/StatisticValue" tools:text="20.00%"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="16dp">
+                <TextView style="@style/StatisticLabel" android:text="@string/stats_blank_rate"/>
+                <TextView android:id="@+id/textViewStatsBlankRate" style="@style/StatisticValue" tools:text="13.33%"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                <TextView style="@style/StatisticLabel" android:text="E-posta Doğrulanmış:"/>
+                <TextView android:id="@+id/textViewStatsEmailVerified" style="@style/StatisticValue" tools:text="Evet"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                <TextView style="@style/StatisticLabel" android:text="Premium Üyelik:"/>
+                <TextView android:id="@+id/textViewStatsIsPremium" style="@style/StatisticValue" tools:text="Evet (Aktif)"/>
+            </LinearLayout>
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                <TextView style="@style/StatisticLabel" android:text="Premium Bitiş Tarihi:"/>
+                <TextView android:id="@+id/textViewStatsPremiumExpiration" style="@style/StatisticValue" tools:text="2025-12-31" android:visibility="gone"/>
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/adViewBannerStats"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="24dp"
+                android:text="@string/ad_placeholder_banner"
+                android:gravity="center"
+                android:background="@color/light_grey"/>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,42 @@
+{% extends "admin/admin_base_layout.html" %}
+
+{% block title %}{{ title }} - Admin Paneli{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mt-4 mb-4">{{ title }}</h1>
+
+    {# Flash mesajları admin_base_layout.html içinde zaten gösteriliyor, burada tekrar gerek yok #}
+    {# {% include 'includes/_flash_messages.html' %} #}
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Yeni Admin Kullanıcı Bilgileri</h6>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('admin_add_new_admin_user') }}">
+                {# CSRF token ekleyebilirsiniz, eğer Flask-WTF veya benzeri bir kütüphane kullanıyorsanız #}
+                {# {{ form.csrf_token }} #}
+                <div class="mb-3">
+                    <label for="username" class="form-label">Kullanıcı Adı:</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-posta Adresi:</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Şifre (en az 6 karakter):</label>
+                    <input type="password" class="form-control" id="password" name="password" minlength="6" required>
+                </div>
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-user-plus"></i> Admin Oluştur
+                </button>
+                <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> İptal
+                </a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

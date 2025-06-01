@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">final-QuizApp</string>
+
+    <string name="welcome_message">Welcome to QuizApp!</string>
+    <string name="sign_in_with_google">Sign in with Google</string>
+
+    <string name="submit_button">Submit</string>
+    <string name="skip_button">Skip</string>
+    <string name="correct_answer">Correct!</string>
+    <string name="incorrect_answer">Incorrect!</string>
+    <string name="no_more_questions">No more questions available.</string>
+
+    <string name="check_network_connection">You are Offline</string>
+    <string name="ad_unit_id_interstitial">ca-app-pub-8902956414079117/1181860354</string>
+</resources>

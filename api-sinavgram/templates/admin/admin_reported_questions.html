@@ -1,0 +1,101 @@
+{% extends "admin/admin_base_layout.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mt-4 mb-4">{{ title }}</h1>
+
+    {% if reports_pagination.items %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Raporlanan Sorular Listesi</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Rapor ID</th>
+                            <th>Soru ID</th>
+                            <th>Soru Metni (Kısaltılmış)</th>
+                            <th>Raporlayan</th>
+                            <th>Rapor Nedeni</th>
+                            <th>Rapor Tarihi</th>
+                            <th class="text-center">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for report in reports_pagination.items %}
+                        <tr>
+                            <td>{{ report.id }}</td>
+                            <td>
+                                <a href="{{ url_for('admin_edit_question', question_id=report.question.id) }}" title="Soruyu Görüntüle/Düzenle">
+                                    {{ report.question.id }}
+                                </a>
+                            </td>
+                            <td>
+                                <a href="{{ url_for('admin_edit_question', question_id=report.question.id) }}" title="Soruyu Görüntüle/Düzenle">
+                                    {{ report.question.text[:80] }}{% if report.question.text|length > 80 %}...{% endif %}
+                                </a>
+                            </td>
+                            <td>{{ get_user_username(report.reported_by_user_id) }}</td>
+                            <td>{{ report.reason[:100] if report.reason else '-' }}{% if report.reason and report.reason|length > 100 %}...{% endif %}</td>
+                            <td>{{ report.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td class="text-center action-buttons">
+                                <a href="{{ url_for('admin_edit_question', question_id=report.question.id) }}" class="btn btn-sm btn-info" title="Soruyu Düzenle/Görüntüle"><i class="fas fa-edit"></i></a>
+                                <form action="{{ url_for('admin_approve_question', question_id=report.question.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bu soruyu onaylayıp raporu çözmek istediğinizden emin misiniz?');">
+                                    <button type="submit" class="btn btn-sm btn-success" title="Soruyu Onayla & Raporu Çöz"><i class="fas fa-check-double"></i></button>
+                                </form>
+                                 <form action="{{ url_for('admin_dismiss_report', report_id=report.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bu raporu kapatmak istediğinizden emin misiniz? (Soru olduğu gibi kalır)');">
+                                    <button type="submit" class="btn btn-sm btn-secondary" title="Raporu Kapat"><i class="fas fa-eye-slash"></i></button>
+                                </form>
+                                <form action="{{ url_for('admin_delete_question', question_id=report.question.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bu soruyu ve ilişkili tüm raporları KALICI olarak silmek istediğinizden emin misiniz?');">
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Soruyu Sil"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% if reports_pagination.pages > 1 %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if reports_pagination.has_prev %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('admin_reported_questions', page=reports_pagination.prev_num) }}">Önceki</a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Önceki</span></li>
+            {% endif %}
+
+            {% for page_num in reports_pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if page_num %}
+                    {% if reports_pagination.page == page_num %}
+                        <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="{{ url_for('admin_reported_questions', page=page_num) }}">{{ page_num }}</a></li>
+                    {% endif %}
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if reports_pagination.has_next %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('admin_reported_questions', page=reports_pagination.next_num) }}">Sonraki</a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Sonraki</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        Yeni raporlanmış soru bulunmamaktadır.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.mehmetalper04.sinavgram">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:name=".sinavgram"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Finalsinavgram"
+        android:usesCleartextTraffic="true"
+        tools:targetApi="31">
+
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="@string/admob_app_id"/>
+
+        <activity
+            android:name=".activities.LoginActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="sorugramapp" android:host="callback" android:pathPrefix="/login" />
+                <data android:scheme="sorugramapp" android:host="login"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activities.RegisterActivity"
+            android:label="Kayıt Ol"
+            android:parentActivityName=".activities.LoginActivity" />
+
+        <activity
+            android:name=".activities.CourseSelectionActivity"
+            android:label="Ders Seçimi" />
+
+        <activity
+            android:name=".activities.QuizActivity"
+            android:label="Sınav Ekranı"
+            android:parentActivityName=".activities.CourseSelectionActivity" />
+
+        <activity
+            android:name=".activities.StatisticsActivity"
+            android:label="İstatistiklerim"
+            android:parentActivityName=".activities.CourseSelectionActivity" />
+
+        <activity
+            android:name=".activities.SubmitQuestionActivity"
+            android:label="Soru Gönder"
+            android:parentActivityName=".activities.CourseSelectionActivity" />
+
+    </application>
+
+</manifest>

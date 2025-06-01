@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Giriş Yap - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <h2 class="text-center mb-4">Giriş Yap</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="identifier">Kullanıcı Adı veya E-posta</label>
+                <input type="text" class="form-control" id="identifier" name="identifier" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Şifre</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Giriş Yap</button>
+            <div id="loginMessage" class="mt-3"></div>
+        </form>
+        <p class="mt-3 text-center">
+            Hesabınız yok mu? <a href="{{ url_for('register_page') }}">Kayıt Olun</a>
+        </p>
+         <p class="mt-3 text-center">
+            <a href="#" id="resendVerificationLink" style="display:none;">Doğrulama E-postasını Tekrar Gönder</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const identifier = document.getElementById('identifier').value;
+    const password = document.getElementById('password').value;
+    const messageDiv = document.getElementById('loginMessage');
+    const resendLink = document.getElementById('resendVerificationLink');
+    messageDiv.innerHTML = '';
+    resendLink.style.display = 'none';
+
+    try {
+        // DÜZELTİLDİ: API_BASE_URL yerine url_for kullanıldı
+        const response = await fetch("{{ url_for('login_user_api', _external=True) }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ identifier, password })
+        });
+        const data = await response.json();
+
+        if (response.ok) {
+            localStorage.setItem('sorugram_token', data.token);
+            localStorage.setItem('sorugram_user', JSON.stringify(data.user));
+            messageDiv.innerHTML = '<div class="alert alert-success">Giriş başarılı! Yönlendiriliyorsunuz...</div>';
+            // updateNav(); // Bu fonksiyonun tanımlı olduğundan emin olun veya kaldırın/uyarlayın
+            // showAlert('Giriş başarılı!', 'success'); // Bu fonksiyonun tanımlı olduğundan emin olun veya kaldırın/uyarlayın
+            window.location.href = "{{ url_for('index_page') }}";
+        } else {
+            let errorMessage = data.message || 'Giriş başarısız.';
+            if (data.email_not_verified) {
+                errorMessage += ' Lütfen e-postanızı (ve spam klasörünü) kontrol edin.';
+                resendLink.style.display = 'block';
+                resendLink.dataset.email = data.email;
+            }
+            messageDiv.innerHTML = `<div class="alert alert-danger">${errorMessage}</div>`;
+        }
+    } catch (error) {
+        messageDiv.innerHTML = '<div class="alert alert-danger">Bir ağ hatası oluştu. Lütfen tekrar deneyin.</div>';
+        console.error('Login error:', error);
+    }
+});
+
+document.getElementById('resendVerificationLink').addEventListener('click', async function(e) {
+    e.preventDefault();
+    const email = this.dataset.email;
+    const messageDiv = document.getElementById('loginMessage');
+    if (!email) return;
+
+    messageDiv.innerHTML = '<div class="alert alert-info">Doğrulama e-postası gönderiliyor...</div>';
+    try {
+        // DÜZELTİLDİ: API_BASE_URL yerine url_for kullanıldı
+        const response = await fetch("{{ url_for('resend_verification_email_api', _external=True) }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' }, // API'niz token beklemiyorsa Authorization başlığını kaldırın
+            body: JSON.stringify({ email: email })
+        });
+        const data = await response.json();
+        if (response.ok) {
+            messageDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+        } else {
+            messageDiv.innerHTML = `<div class="alert alert-danger">${data.message || 'E-posta gönderilemedi.'}</div>`;
+        }
+    } catch (error) {
+        messageDiv.innerHTML = '<div class="alert alert-danger">Doğrulama e-postası gönderilirken bir ağ hatası oluştu.</div>';
+        console.error('Resend error:', error);
+    }
+});
+</script>
+{% endblock %}

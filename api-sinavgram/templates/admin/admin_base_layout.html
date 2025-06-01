@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin Paneli{% endblock %} - {{ config.APP_NAME }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" xintegrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fa; /* Açık gri arka plan */
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px; /* Sidebar genişliği */
+            background-color: #343a40; /* Koyu sidebar */
+            color: white;
+            padding-top: 1rem;
+            transition: width 0.3s ease;
+            z-index: 1030; /* Navbar'ın üzerinde kalması için */
+        }
+        .sidebar .nav-link {
+            color: #adb5bd; /* Pasif link rengi */
+            padding: 0.75rem 1.5rem;
+            font-size: 0.95rem;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            color: white;
+            background-color: #495057; /* Aktif/hover link arka planı */
+        }
+        .sidebar .nav-link .fas,
+        .sidebar .nav-link .far,
+        .sidebar .nav-link .fab {
+            margin-right: 0.75rem;
+            width: 20px; /* İkonlar için sabit genişlik */
+            text-align: center;
+        }
+        .sidebar-header {
+            padding: 1rem 1.5rem;
+            text-align: center;
+            border-bottom: 1px solid #495057; /* Header altı çizgi */
+            margin-bottom: 1rem;
+        }
+        .sidebar-header h5 {
+            margin: 0;
+            color: white;
+            font-weight: 600;
+        }
+        .content-wrapper {
+            margin-left: 250px; /* Sidebar genişliği kadar */
+            padding-top: 56px; /* Navbar yüksekliği */
+            transition: margin-left 0.3s ease;
+        }
+        .top-navbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 250px; /* Sidebar genişliği kadar */
+            z-index: 1020;
+            background-color: #ffffff; /* Beyaz navbar */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: left 0.3s ease;
+            height: 56px;
+        }
+        .sidebar.collapsed {
+            width: 70px; /* Daraltılmış sidebar genişliği */
+        }
+        .sidebar.collapsed .nav-link span,
+        .sidebar.collapsed .sidebar-header h5 {
+            display: none;
+        }
+        .sidebar.collapsed .nav-link .fas,
+        .sidebar.collapsed .nav-link .far,
+        .sidebar.collapsed .nav-link .fab {
+            margin-right: 0;
+        }
+        .sidebar.collapsed + .top-navbar {
+            left: 70px; /* Daraltılmış sidebar genişliği kadar */
+        }
+        .sidebar.collapsed ~ .content-wrapper {
+            margin-left: 70px; /* Daraltılmış sidebar genişliği kadar */
+        }
+        #sidebarToggle {
+            color: #6c757d; /* Buton rengi */
+        }
+        .main-content {
+            padding: 1.5rem;
+        }
+        .stat-card {
+            border: none;
+            border-radius: 0.5rem;
+        }
+        .badge-sidebar {
+            font-size: 0.7em;
+            padding: 0.3em 0.5em;
+        }
+        .table th, .table td {
+            vertical-align: middle;
+        }
+        .action-buttons .btn {
+            margin-right: 5px;
+        }
+         /* Flashed messages için stil */
+        .flashed-messages-container {
+            position: fixed;
+            top: 60px; /* Navbar'ın hemen altı */
+            right: 20px;
+            z-index: 1050; /* Diğer elementlerin üzerinde */
+            width: auto;
+            max-width: 400px; /* Maksimum genişlik */
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <nav class="sidebar" id="adminSidebar">
+        <div class="sidebar-header">
+            <h5>{{ config.APP_NAME }}</h5>
+        </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'admin_dashboard' %}active{% endif %}" href="{{ url_for('admin_dashboard') }}">
+                    <i class="fas fa-tachometer-alt"></i> <span>Panel</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'admin_pending_questions' %}active{% endif %}" href="{{ url_for('admin_pending_questions') }}">
+                    <i class="fas fa-hourglass-half"></i> <span>Onay Bekleyenler</span>
+                    {% if pending_count and pending_count > 0 %}
+                        <span class="badge bg-warning float-end badge-sidebar">{{ pending_count }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'admin_reported_questions' %}active{% endif %}" href="{{ url_for('admin_reported_questions') }}">
+                    <i class="fas fa-flag"></i> <span>Raporlananlar</span>
+                    {% if reported_count and reported_count > 0 %}
+                        <span class="badge bg-danger float-end badge-sidebar">{{ reported_count }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            {% if admin_user and admin_user.username == 'mehmetalper04' %}
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint == 'admin_add_new_admin_user' %}active{% endif %}" href="{{ url_for('admin_add_new_admin_user') }}">
+                    <i class="fas fa-user-plus"></i> <span>Yeni Admin Ekle</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.endpoint in ['admin_manage_users', 'admin_add_new_admin_user'] %}active{% endif %}" href="{{ url_for('admin_manage_users') }}">
+                    <i class="fas fa-users-cog"></i> <span>Kullanıcı Yönetimi</span>
+                </a>
+            </li>
+            {% endif %}
+            <li class="nav-item mt-auto"> <a class="nav-link" href="{{ url_for('admin_logout') }}">
+                    <i class="fas fa-sign-out-alt"></i> <span>Çıkış Yap</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <nav class="navbar navbar-expand-lg navbar-light top-navbar">
+        <div class="container-fluid">
+            <button class="btn btn-light me-2" id="sidebarToggle"><i class="fas fa-bars"></i></button>
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">{{ title | default('Admin Paneli') }}</a>
+            <div class="ms-auto">
+                {% if admin_user %}
+                <span class="navbar-text">
+                    Hoşgeldin, <strong>{{ admin_user.username }}</strong>
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="content-wrapper">
+        <div class="flashed-messages-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        </div>
+
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="py-4 bg-light mt-auto">
+            <div class="container-fluid px-4">
+                <div class="d-flex align-items-center justify-content-between small">
+                    <div class="text-muted">&copy; {{ now.year }} {{ config.APP_NAME }}. Tüm hakları saklıdır.</div>
+                    <div>
+                        </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('adminSidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const topNavbar = document.querySelector('.top-navbar');
+            const contentWrapper = document.querySelector('.content-wrapper');
+
+            // Sayfa yüklendiğinde localStorage'dan durumu al
+            const isSidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (isSidebarCollapsed) {
+                sidebar.classList.add('collapsed');
+                topNavbar.style.left = '70px';
+                contentWrapper.style.marginLeft = '70px';
+            }
+
+
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                const collapsed = sidebar.classList.contains('collapsed');
+                if (collapsed) {
+                    topNavbar.style.left = '70px';
+                    contentWrapper.style.marginLeft = '70px';
+                } else {
+                    topNavbar.style.left = '250px';
+                    contentWrapper.style.marginLeft = '250px';
+                }
+                // Durumu localStorage'a kaydet
+                localStorage.setItem('sidebarCollapsed', collapsed);
+            });
+        });
+    </script>
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

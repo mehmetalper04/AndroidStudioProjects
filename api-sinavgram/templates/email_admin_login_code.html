@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ app_name }} Admin Giriş Kodu</title>
+</head>
+<body>
+    <p>Merhaba {{ user_username }},</p>
+    <p>Admin paneline giriş yapmak için doğrulama kodunuz aşağıdadır:</p>
+    <h2 style="font-size: 24px; color: #333; letter-spacing: 2px; border: 1px solid #ddd; padding: 10px; display: inline-block;">{{ login_code }}</h2>
+    <p>Bu kod <strong>{{ expiration_minutes }} dakika</strong> süreyle geçerlidir.</p>
+    <p>Eğer bu işlemi siz başlatmadıysanız, bu e-postayı dikkate almayınız ve şifrenizi değiştirmeyi düşünebilirsiniz.</p>
+    <p>Teşekkürler,<br>{{ app_name }} Ekibi</p>
+</body>
+</html>

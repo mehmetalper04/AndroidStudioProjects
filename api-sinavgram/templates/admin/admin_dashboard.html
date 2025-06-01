@@ -1,0 +1,74 @@
+{% extends "admin/admin_base_layout.html" %}
+
+{% block title %}Admin Paneli{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mt-4 mb-4">Admin Paneli</h1>
+
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Onay Bekleyen Sorular</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pending_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-hourglass-half fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('admin_pending_questions') }}" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                                Raporlanan Sorular</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ reported_count }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-flag fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                     <a href="{{ url_for('admin_reported_questions') }}" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+        
+        </div>
+
+    <div class="row mt-4">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Hızlı İşlemler</h6>
+                </div>
+                <div class="card-body">
+                    <p>Admin paneline hoş geldiniz. Buradan bekleyen ve raporlanan soruları yönetebilirsiniz.</p>
+                    <a href="{{ url_for('admin_pending_questions')}}" class="btn btn-primary me-2">Onay Bekleyenlere Git</a>
+                    <a href="{{ url_for('admin_reported_questions')}}" class="btn btn-danger">Raporlananlara Git</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    .card.border-left-primary { border-left: .25rem solid #4e73df!important; }
+    .card.border-left-success { border-left: .25rem solid #1cc88a!important; }
+    .card.border-left-info { border-left: .25rem solid #36b9cc!important; }
+    .card.border-left-warning { border-left: .25rem solid #f6c23e!important; }
+    .card.border-left-danger { border-left: .25rem solid #e74a3b!important; }
+    .text-gray-300 { color: #dddfeb!important; }
+    .text-gray-800 { color: #5a5c69!important; }
+</style>
+{% endblock %}

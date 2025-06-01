@@ -1,0 +1,101 @@
+{% extends "admin/admin_base_layout.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="mt-4 mb-4">{{ title }}</h1>
+
+    {% if questions_pagination.items %}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Onay Bekleyen Sorular Listesi</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Soru Metni (Kısaltılmış)</th>
+                            <th>Ders</th>
+                            <th>Gönderen</th>
+                            <th>Tarih</th>
+                            <th class="text-center">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for question in questions_pagination.items %}
+                        <tr>
+                            <td>{{ question.id }}</td>
+                            <td>
+                                <a href="{{ url_for('admin_edit_question', question_id=question.id) }}" title="Soruyu Görüntüle/Düzenle">
+                                    {{ question.text[:80] }}{% if question.text|length > 80 %}...{% endif %}
+                                </a>
+                            </td>
+                            <td>{{ get_course_name(question.course_id) }}</td>
+                            <td>
+                                {% if question.submitted_by_user_id %}
+                                    {{ get_user_username(question.submitted_by_user_id) }}
+                                {% else %}
+                                    Admin/Sistem
+                                {% endif %}
+                            </td>
+                            <td>{{ question.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td class="text-center action-buttons">
+                                <a href="{{ url_for('admin_edit_question', question_id=question.id) }}" class="btn btn-sm btn-info" title="Düzenle/Görüntüle"><i class="fas fa-edit"></i></a>
+                                <form action="{{ url_for('admin_approve_question', question_id=question.id) }}" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-success" title="Onayla"><i class="fas fa-check"></i></button>
+                                </form>
+                                <form action="{{ url_for('admin_reject_question', question_id=question.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bu soruyu reddetmek istediğinizden emin misiniz?');">
+                                    <button type="submit" class="btn btn-sm btn-warning" title="Reddet"><i class="fas fa-times"></i></button>
+                                </form>
+                                <form action="{{ url_for('admin_delete_question', question_id=question.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Bu soruyu KALICI olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz!');">
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Sil"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% if questions_pagination.pages > 1 %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if questions_pagination.has_prev %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('admin_pending_questions', page=questions_pagination.prev_num) }}">Önceki</a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Önceki</span></li>
+            {% endif %}
+
+            {% for page_num in questions_pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if page_num %}
+                    {% if questions_pagination.page == page_num %}
+                        <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="{{ url_for('admin_pending_questions', page=page_num) }}">{{ page_num }}</a></li>
+                    {% endif %}
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if questions_pagination.has_next %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('admin_pending_questions', page=questions_pagination.next_num) }}">Sonraki</a></li>
+            {% else %}
+                <li class="page-item disabled"><span class="page-link">Sonraki</span></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        Onay bekleyen soru bulunmamaktadır.
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Canlı İstatistikler - {{ super() }}{% endblock %}
+
+{% block head_extra %}
+    <meta http-equiv="refresh" content="30"> <style>
+        /* live_stats.html'e özel ek stiller */
+        .stat-card {
+            background-color: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.2s ease-in-out;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        .stat-card h3 {
+            font-size: 1.25rem; /* Biraz küçültüldü */
+            color: #007bff; /* base.html'deki navbar rengiyle uyumlu */
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .stat-card p {
+            font-size: 2rem; /* Biraz küçültüldü */
+            font-weight: bold;
+            color: #343a40;
+            margin-bottom: 0;
+        }
+        .leaderboard {
+            background-color: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.1);
+            padding: 1.5rem;
+        }
+        .leaderboard h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: #198754; /* Yeşil bir ton */
+            font-weight: 600;
+        }
+        .table th {
+            background-color: #e9ecef;
+            font-weight: 600;
+        }
+        .page-title {
+            text-align: center;
+            margin-top: 1rem; /* base.html'deki padding-top: 70px ile uyumlu */
+            margin-bottom: 2rem;
+            color: #343a40;
+            font-size: 2.25rem;
+            font-weight: bold;
+        }
+        .last-updated {
+            text-align: center;
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-bottom: 2rem;
+        }
+        /* Footer'ı base.html'den alacağı için buradaki footer stilini kaldırabiliriz veya özelleştirebiliriz */
+        /* .footer { ... } */
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4"> {# Tam ekran yayılım için container-fluid #}
+    <h1 class="page-title">📊 Canlı Uygulama İstatistikleri 📊</h1>
+    <p class="last-updated">Son Güncelleme: {{ now_utc.strftime('%Y-%m-%d %H:%M:%S') }} UTC (30 saniyede bir yenilenir)</p>
+
+    <div class="row">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stat-card">
+                <h3><i class="fas fa-users"></i> Toplam Kullanıcı</h3>
+                <p>{{ stats.total_users }}</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stat-card">
+                <h3><i class="fas fa-star"></i> Aktif Premium</h3>
+                <p>{{ stats.active_premium_users }}</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stat-card">
+                <h3><i class="fas fa-question-circle"></i> Toplam Soru</h3>
+                <p>{{ stats.total_questions }}</p>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stat-card">
+                <h3><i class="fas fa-crown"></i> Premium Soru</h3>
+                <p>{{ stats.total_premium_questions }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="leaderboard mt-4">
+        <h2>🏆 Liderlik Tablosu (Top 10) 🏆</h2>
+        {% if stats.top_10_users %}
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="thead-light">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Kullanıcı Adı</th>
+                        <th scope="col">Puan</th>
+                        <th scope="col">Premium</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_stat in stats.top_10_users %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td><i class="fas fa-user-circle text-secondary me-2"></i>{{ user_stat.username }}</td>
+                        <td><strong>{{ user_stat.score }}</strong></td>
+                        <td>
+                            {% if user_stat.is_premium %}
+                                <span class="badge bg-warning text-dark"><i class="fas fa-star"></i> Evet</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Hayır</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-center text-muted py-4">Liderlik tablosu için henüz yeterli veri yok.</p>
+        {% endif %}
+    </div>
+    
+    {% if admin_user_link_visible %}
+         <div class="text-center mt-4">
+             <a href="{{ url_for('admin_dashboard') }}" class="btn btn-outline-secondary"><i class="fas fa-tachometer-alt"></i> Admin Paneline Dön</a>
+         </div>
+    {% endif %}
+</div>
+
+{# Bu sayfanın kendi footer'ı olmayacak, base.html'deki footer kullanılacak #}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }} {# base.html'deki scriptleri dahil et #}
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script> 
+{% endblock %}

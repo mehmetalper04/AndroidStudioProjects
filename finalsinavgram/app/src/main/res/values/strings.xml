@@ -1,0 +1,65 @@
+<resources>
+    <string name="app_name">sinavgram</string>
+
+    <string name="login_email_hint">E-posta</string>
+    <string name="login_password_hint">Şifre</string>
+    <string name="login_button_text">Giriş Yap</string>
+    <string name="login_no_account_text">Hesabın yok mu?</string>
+    <string name="login_register_now_text"><u>Şimdi Kaydol</u></string>
+
+    <string name="register_username_hint">Kullanıcı Adı (Benzersiz)</string>
+    <string name="register_email_hint">E-posta</string>
+    <string name="register_password_hint">Şifre</string>
+    <string name="register_confirm_password_hint">Şifreyi Onayla</string>
+    <string name="register_button_text">Kaydol</string>
+    <string name="register_already_have_account_text">Zaten hesabın var mı?</string>
+    <string name="register_login_now_text"><u>Şimdi Giriş Yap</u></string>
+    <string name="email_verification_message">Lütfen e-postanızı kontrol edin ve hesabınızı doğrulayın.</string>
+
+    <string name="course_selection_title">Bir Ders Seçin</string>
+    <string name="course_turkish">Türkçe</string>
+    <string name="course_mathematics">Matematik</string>
+    <string name="course_physics">Fizik</string>
+    <string name="course_chemistry">Kimya</string>
+    <string name="course_biology">Biyoloji</string>
+    <string name="course_history">Tarih</string>
+    <string name="course_geography">Coğrafya</string>
+    <string name="course_philosophy">Felsefe</string>
+    <string name="course_religion">Din Kültürü</string>
+
+    <string name="quiz_question_placeholder">Soru metni buraya gelecek...</string>
+    <string name="quiz_option_empty">Boş Bırak</string>
+    <string name="quiz_report_question">Soruyu Bildir</string>
+    <string name="quiz_share_question">Soruyu Paylaş</string>
+    <string name="quiz_skip_question_instruction">Soruyu geçmek için yukarı kaydırın</string>
+    <string name="quiz_points_label">Puan:</string>
+
+    <string name="stats_title">İstatistiklerim</string>
+    <string name="stats_total_answered">Toplam Cevaplanan:</string>
+    <string name="stats_true_answers">Doğru Cevaplar:</string>
+    <string name="stats_false_answers">Yanlış Cevaplar:</string>
+    <string name="stats_blank_answers">Boş Cevaplar:</string>
+    <string name="stats_true_rate">Doğru Oranı:</string>
+    <string name="stats_false_rate">Yanlış Oranı:</string>
+    <string name="stats_blank_rate">Boş Oranı:</string>
+
+    <string name="submit_question_title">Yeni Soru Gönder</string>
+    <string name="submit_select_course">Ders Seçin</string>
+    <string name="submit_question_text_hint">Soru Metni</string>
+    <string name="submit_option_a_hint">A Seçeneği</string>
+    <string name="submit_option_b_hint">B Seçeneği</string>
+    <string name="submit_option_c_hint">C Seçeneği</string>
+    <string name="submit_option_d_hint">D Seçeneği</string>
+    <string name="submit_option_e_hint">E Seçeneği</string>
+    <string name="submit_correct_answer_label">Doğru Cevap:</string>
+    <string name="submit_add_photo">Fotoğraf Ekle (İsteğe Bağlı)</string>
+    <string name="submit_button">Gönder</string>
+    <string name="question_submitted_message">Sorunuz onay için gönderildi. Teşekkürler!</string>
+
+    <string name="ad_placeholder_banner">Banner Reklam Alanı</string>
+    <string name="premium_ad_message">Premium özelliklere göz atın!</string>
+    <string name="admob_interstitial_test_id">ca-app-pub-3940256099942544/5354046379</string>
+    <string name="admob_app_id">ca-app-pub-8902956414079117~6291544781</string>
+    <string name="admob_banner_test_id">ca-app-pub-3940256099942544/6300978111</string>
+
+</resources>

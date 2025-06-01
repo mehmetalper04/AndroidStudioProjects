@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ app_name }} - Ödeme Makbuzu</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4; }
+        .email-container { max-width: 600px; margin: 20px auto; background-color: #ffffff; padding: 20px; border: 1px solid #dddddd; }
+        .header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid #eeeeee; }
+        .header h1 { color: #333333; margin: 0; }
+        .content { padding: 20px 0; }
+        .content h2 { color: #333333; }
+        .content p { color: #555555; line-height: 1.6; }
+        .receipt-details { width: 100%; margin-top: 20px; border-collapse: collapse; }
+        .receipt-details th, .receipt-details td { border: 1px solid #dddddd; padding: 8px; text-align: left; }
+        .receipt-details th { background-color: #f8f8f8; }
+        .footer { text-align: center; padding-top: 20px; border-top: 1px solid #eeeeee; font-size: 0.9em; color: #777777; }
+        a { color: #007bff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>{{ app_name }}</h1>
+        </div>
+        <div class="content">
+            <h2>Ödeme Makbuzu</h2>
+            <p>Merhaba {{ user.username }},</p>
+            <p>{{ app_name }} üzerinden yapmış olduğunuz premium üyelik alımınız için teşekkür ederiz. Ödeme detaylarınız aşağıdadır:</p>
+
+            <table class="receipt-details">
+                <tr>
+                    <th>Makbuz ID (İşlem No):</th>
+                    <td>{{ payment.payment_gateway_transaction_id }}</td>
+                </tr>
+                <tr>
+                    <th>Satın Alma Tarihi:</th>
+                    <td>{{ payment.created_at.strftime('%d-%m-%Y %H:%M:%S') }} (UTC)</td>
+                </tr>
+                <tr>
+                    <th>Satın Alınan Plan:</th>
+                    <td>{{ payment.plan_type|capitalize }} Premium</td>
+                </tr>
+                <tr>
+                    <th>Ödenen Tutar:</th>
+                    <td>{{ "%.2f"|format(payment.amount_paid) }} {{ payment.currency }}</td>
+                </tr>
+                <tr>
+                    <th>Üyelik Bitiş Tarihi:</th>
+                    <td>{{ user.premium_expiration_date.strftime('%d-%m-%Y %H:%M:%S') if user.premium_expiration_date else 'N/A' }} (UTC)</td>
+                </tr>
+            </table>
+
+            <p style="margin-top: 30px;">Üyeliğiniz başarıyla aktifleştirilmiştir. {{ app_name }}'in premium özelliklerinin keyfini çıkarabilirsiniz!</p>
+            <p>Herhangi bir sorunuz olursa, lütfen <a href="mailto:{{ config.MAIL_USERNAME }}">destek ekibimizle</a> iletişime geçmekten çekinmeyin.</p>
+            <p>Teşekkürler,<br>{{ app_name }} Ekibi</p>
+        </div>
+        <div class="footer">
+            <p>&copy; {{ now_utc.year }} {{ app_name }}. Tüm hakları saklıdır.</p>
+        </div>
+    </div>
+</body>
+</html>
